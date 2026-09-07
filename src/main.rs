@@ -26,15 +26,28 @@ macro_rules! error_log { ($($arg:tt)*) => { log::error!($($arg)*); }; }
 
 // NO-OP VERSIONS IN RELEASE MODE
 #[cfg(not(debug_assertions))]
-macro_rules! trace_log { ($($arg:tt)*) => {}; }
+#[allow(unused_macros)]
+macro_rules! trace_log {
+    ($($arg:tt)*) => {};
+}
 #[cfg(not(debug_assertions))]
-macro_rules! debug_log { ($($arg:tt)*) => {}; }
+#[allow(unused_macros)]
+macro_rules! debug_log {
+    ($($arg:tt)*) => {};
+}
 #[cfg(not(debug_assertions))]
-macro_rules! info_log { ($($arg:tt)*) => {}; }
+macro_rules! info_log {
+    ($($arg:tt)*) => {};
+}
 #[cfg(not(debug_assertions))]
-macro_rules! warn_log { ($($arg:tt)*) => {}; }
+#[allow(unused_macros)]
+macro_rules! warn_log {
+    ($($arg:tt)*) => {};
+}
 #[cfg(not(debug_assertions))]
-macro_rules! error_log { ($($arg:tt)*) => {}; }
+macro_rules! error_log {
+    ($($arg:tt)*) => {};
+}
 
 /// # Enum `Token`
 ///
@@ -54,16 +67,16 @@ macro_rules! error_log { ($($arg:tt)*) => {}; }
 enum Token {
     /// Real number (e.g. 3.14, 42.0)
     Number(f64),
-    
+
     /// Addition operator: '+'
-    Plus,       
-    
+    Plus,
+
     /// Subtraction operator: '-'
-    Minus,       
-    
+    Minus,
+
     /// Multiplication operator: '*'
-    Multiply,  
-    
+    Multiply,
+
     /// Division operator: '/'
     Divide,
 
@@ -74,11 +87,11 @@ enum Token {
     Dollar,
 
     /// Opening parenthesis: '('
-    LeftParen, 
-    
+    LeftParen,
+
     /// Closing parenthesis: ')'
-    RightParen,  
-    
+    RightParen,
+
     /// End-of-expression symbol: '='
     Equals,
 }
@@ -123,7 +136,10 @@ impl Token {
     #[inline]
     #[allow(unused)]
     fn is_operator(&self) -> bool {
-        matches!(self, Token::Plus | Token::Minus | Token::Multiply | Token::Divide)
+        matches!(
+            self,
+            Token::Plus | Token::Minus | Token::Multiply | Token::Divide
+        )
     }
 }
 
@@ -152,16 +168,16 @@ enum MathError {
     ExpressionTooComplex,
 
     /// Exponentiation with invalid base or exponent.
-    InvalidExponentiation { base: f64, exponent: f64, },
+    InvalidExponentiation { base: f64, exponent: f64 },
 
     /// Root of a negative number with a fractional index.
-    NegativeRoot { base: f64, root: f64, },
+    NegativeRoot { base: f64, root: f64 },
 
     /// Even-index root of a negative number (undefined over reals).
-    EvenRootOfNegative { base: f64, root: f64, },
+    EvenRootOfNegative { base: f64, root: f64 },
 
     /// Root with invalid base or index.
-    InvalidRoot { base: f64, root: f64, },
+    InvalidRoot { base: f64, root: f64 },
 }
 
 /// Error types that can occur during tokenization or parsing.
@@ -209,35 +225,55 @@ impl std::fmt::Display for MathError {
             MathError::DivisionByZero => {
                 error_log!("Error: division by zero");
                 write!(f, "Math error: division by zero")
-            },
+            }
             MathError::OverflowError => {
                 error_log!("Error: numeric overflow");
                 write!(f, "Math error: numeric overflow")
-            },
+            }
             MathError::UnderflowError => {
                 error_log!("Error: numeric underflow");
                 write!(f, "Math error: numeric underflow")
-            },
+            }
             MathError::ExpressionTooComplex => {
                 error_log!("Error: expression too complex");
                 write!(f, "Error: expression too complex")
-            },
+            }
             MathError::InvalidExponentiation { base, exponent } => {
-                error_log!("Error: invalid exponentiation (base: {}, exponent: {})", base, exponent);
+                error_log!(
+                    "Error: invalid exponentiation (base: {}, exponent: {})",
+                    base,
+                    exponent
+                );
                 write!(f, "Error: invalid exponentiation ({} ^ {})", base, exponent)
-            },
+            }
             MathError::NegativeRoot { base, root } => {
-                error_log!("Error: fractional-index root of a negative number (base: {}, index: {})", base, root);
-                write!(f, "Error: fractional root of a negative number ({} $ {})", base, root)
-            },
+                error_log!(
+                    "Error: fractional-index root of a negative number (base: {}, index: {})",
+                    base,
+                    root
+                );
+                write!(
+                    f,
+                    "Error: fractional root of a negative number ({} $ {})",
+                    base, root
+                )
+            }
             MathError::EvenRootOfNegative { base, root } => {
-                error_log!("Error: even-index root of a negative number (base: {}, index: {})", base, root);
-                write!(f, "Error: even-index root of a negative number ({} $ {})", base, root)
-            },
+                error_log!(
+                    "Error: even-index root of a negative number (base: {}, index: {})",
+                    base,
+                    root
+                );
+                write!(
+                    f,
+                    "Error: even-index root of a negative number ({} $ {})",
+                    base, root
+                )
+            }
             MathError::InvalidRoot { base, root } => {
                 error_log!("Error: invalid root (base: {}, index: {})", base, root);
                 write!(f, "Error: invalid root ({} $ {})", base, root)
-            },
+            }
         }
     }
 }
@@ -255,27 +291,27 @@ impl std::fmt::Display for TokenError {
             TokenError::InvalidNumber(msg) => {
                 error_log!("Invalid number: {}", msg);
                 write!(f, "Invalid number: {}", msg)
-            },
+            }
             TokenError::UnmatchedParenthesis { found, position } => {
                 error_log!("Missing parenthesis '{}' at position {}", found, position);
                 write!(f, "Error: missing '{}' at position {}", found, position)
-            },
+            }
             TokenError::UnexpectedEnd => {
                 error_log!("Error: unexpected end of expression");
                 write!(f, "Error: expression ended unexpectedly")
-            },
+            }
             TokenError::InvalidExpression(msg) => {
                 error_log!("Error: invalid expression ({})", msg);
                 write!(f, "Error: invalid expression - {}", msg)
-            },
+            }
             TokenError::InvalidOperator(op) => {
                 error_log!("Invalid operator: '{}'", op);
                 write!(f, "Error: invalid operator '{}'", op)
-            },
+            }
             TokenError::UnexpectedToken(token) => {
                 error_log!("Unexpected token: {:?}", token);
                 write!(f, "Error: unexpected token {:?}", token)
-            },
+            }
             TokenError::SyntaxError(msg) => {
                 error_log!("Syntax error: {}", msg);
                 write!(f, "Syntax error: {}", msg)
@@ -353,7 +389,6 @@ impl std::error::Error for CalcError {}
 ///   - `TokenError`: syntax or expression parsing errors.
 type CalcResult = Result<f64, CalcError>;
 
-
 /// Structure responsible for lexical analysis of a mathematical expression.
 ///
 /// Splits the input string into a sequence of recognized tokens.
@@ -393,7 +428,7 @@ impl<'a> Tokenizer<'a> {
         // Scans each character until reaching the end of input.
         while self.position < self.input.len() {
             let c = self.current_char();
-            
+
             match c {
                 // Ignores whitespace.
                 c if c.is_whitespace() => self.advance(),
@@ -412,7 +447,7 @@ impl<'a> Tokenizer<'a> {
                         info_log!("Symbol token found: {:?}", token);
                         tokens.push(token);
                         self.advance();
-                    } 
+                    }
                     // Handles unrecognized tokens using InvalidOperator, where c is the unknown character.
                     else {
                         return Err(TokenError::InvalidOperator(c));
@@ -420,7 +455,7 @@ impl<'a> Tokenizer<'a> {
                 }
             }
         }
-        
+
         // Tokenization completed: return OK and the token vector to parse.
         info_log!("Tokenization completed: {:?}", tokens);
         Ok(tokens)
@@ -451,7 +486,11 @@ impl<'a> Tokenizer<'a> {
                 // Rejects numbers with multiple decimal points.
                 // If a second '.' appears after the number is already marked as decimal, return an error.
                 // Invalid example: "2..3"
-                '.' => return Err(TokenError::InvalidNumber("Number with multiple decimal points".into())),
+                '.' => {
+                    return Err(TokenError::InvalidNumber(
+                        "Number with multiple decimal points".into(),
+                    ));
+                }
 
                 // Stops reading at the first non-numeric character.
                 _ => break,
@@ -484,7 +523,6 @@ impl<'a> Tokenizer<'a> {
     }
 }
 
-
 /// Parser for mathematical expressions based on a token sequence.
 /// Handles syntax analysis and expression evaluation according to operator precedence.
 struct MathExpressionParser {
@@ -504,7 +542,10 @@ impl MathExpressionParser {
     /// An initialized `MathExpressionParser` instance with starting position set to zero.
     fn new(tokens: Vec<Token>) -> Self {
         info_log!("Parser initialized with tokens: {:?}", tokens);
-        Self { tokens, position: 0 }
+        Self {
+            tokens,
+            position: 0,
+        }
     }
 
     /// Evaluates a complete arithmetic expression according to the formal grammar.
@@ -547,18 +588,16 @@ impl MathExpressionParser {
         // Requires '=' after the expression, consumes it,
         // then verifies no trailing tokens remain.
         match self.next() {
-            Some(Token::Equals) => {
-                match self.peek() {
-                    Some(token) => {
-                        error_log!("Unexpected trailing token after '=': {:?}", token);
-                        Err(TokenError::UnexpectedToken(*token).into())
-                    }
-                    None => {
-                        info_log!("Evaluation completed successfully");
-                        Ok(result)
-                    }
+            Some(Token::Equals) => match self.peek() {
+                Some(token) => {
+                    error_log!("Unexpected trailing token after '=': {:?}", token);
+                    Err(TokenError::UnexpectedToken(*token).into())
                 }
-            }
+                None => {
+                    info_log!("Evaluation completed successfully");
+                    Ok(result)
+                }
+            },
             Some(token) => {
                 // Error: unexpected token after end of expression.
                 error_log!("Unexpected token after evaluation: {:?}", token);
@@ -639,14 +678,14 @@ impl MathExpressionParser {
                 Some(Token::Plus) => {
                     self.advance();
                     let rhs = self.evaluate_p()?; // Right-Hand Side
-                    
+
                     info_log!("Operation: {} + {}", acc, rhs);
                     acc = self.check_overflow(acc + rhs)?;
                 }
                 Some(Token::Minus) => {
                     self.advance();
                     let rhs = self.evaluate_p()?; // Right-Hand Side
-                    
+
                     info_log!("Operation: {} - {}", acc, rhs);
                     acc = self.check_overflow(acc - rhs)?;
                 }
@@ -679,7 +718,7 @@ impl MathExpressionParser {
     /// let mut parser = Parser::new("2 * 3 =");
     /// assert_eq!(parser.evaluate_p().unwrap(), 6.0);
     /// ```
-    /// 
+    ///
     /// ```
     /// let mut parser = Parser::new("4(1 + 2) =");
     /// assert_eq!(parser.evaluate_p().unwrap(), 12.0);  // implicit multiplication
@@ -735,7 +774,7 @@ impl MathExpressionParser {
                 Some(Token::Multiply) => {
                     self.advance();
                     let rhs = self.evaluate_u()?; // Right-Hand Side
-                    
+
                     info_log!("Multiplication: {} * {}", acc, rhs);
                     acc = self.check_overflow(acc * rhs)?;
                 }
@@ -744,20 +783,25 @@ impl MathExpressionParser {
                     self.advance();
                     let rhs = self.evaluate_u()?; // Right-Hand Side
                     // n / 0 -> Error
-                    if rhs == 0.0 { return Err(MathError::DivisionByZero.into()); }
-                    
+                    if rhs == 0.0 {
+                        return Err(MathError::DivisionByZero.into());
+                    }
+
                     info_log!("Division: {} / {}", acc, rhs);
                     acc = self.check_overflow(acc / rhs)?;
                 }
                 // Implicit multiplication: e.g. `2(3 + 4)` or `4 5`
                 Some(Token::Number(_)) | Some(Token::LeftParen) => {
-                    if self.previous_token_is_paren_or_number() && self.can_apply_implicit_multiplication() {
+                    if self.previous_token_is_paren_or_number()
+                        && self.can_apply_implicit_multiplication()
+                    {
                         let rhs = self.evaluate_u()?; // Right-Hand Side
 
                         info_log!("Implicit multiplication: {} * {}", acc, rhs);
                         acc = self.check_overflow(acc * rhs)?;
-                    } 
-                    else { break; }
+                    } else {
+                        break;
+                    }
                 }
                 _ => break,
             }
@@ -776,10 +820,10 @@ impl MathExpressionParser {
     /// - `true` if the previous token is `Token::Number(_)` or `Token::RightParen`.
     /// - `false` otherwise.
     fn previous_token_is_paren_or_number(&self) -> bool {
-        match self.tokens.get(self.position.wrapping_sub(1)) {
-            Some(Token::Number(_)) | Some(Token::RightParen) => true,
-            _ => false,
-        }
+        matches!(
+            self.tokens.get(self.position.wrapping_sub(1)),
+            Some(Token::Number(_)) | Some(Token::RightParen)
+        )
     }
 
     /// Checks whether the current token can represent a valid term
@@ -792,10 +836,7 @@ impl MathExpressionParser {
     /// - `true` if the current token is `Token::Number(_)` or `Token::LeftParen`.
     /// - `false` otherwise.
     fn can_apply_implicit_multiplication(&self) -> bool {
-        match self.peek() {
-            Some(Token::Number(_)) | Some(Token::LeftParen) => true,
-            _ => false,
-        }
+        matches!(self.peek(), Some(Token::Number(_)) | Some(Token::LeftParen))
     }
 
     /// Evaluates a unit of the arithmetic expression, which may include exponents or roots.
@@ -862,7 +903,7 @@ impl MathExpressionParser {
             Some(Token::Caret) => {
                 self.advance();
                 let rhs = self.evaluate_u()?; // Right-Hand Side
-                
+
                 info_log!("Exponentiation: {} ^ {}", acc, rhs);
                 acc = self.evaluate_exponentiation(acc, rhs)?;
                 Ok(acc)
@@ -871,7 +912,7 @@ impl MathExpressionParser {
             Some(Token::Dollar) => {
                 self.advance();
                 let rhs = self.evaluate_u()?; // Right-Hand Side
-                
+
                 info_log!("Root: {} $ {}", acc, rhs);
                 acc = self.evaluate_root(acc, rhs)?;
                 Ok(acc)
@@ -902,10 +943,10 @@ impl MathExpressionParser {
         if result.is_nan() || result.is_infinite() {
             return Err(MathError::InvalidExponentiation { base, exponent }.into());
         }
-        
+
         self.check_overflow(result)
     }
-    
+
     /// Computes a root operation, i.e. `base $ root`.
     ///
     /// This method computes the `root`-th root of `base`.
@@ -924,16 +965,21 @@ impl MathExpressionParser {
     /// - `Err(MathError)` on errors such as division by zero or even root of a negative number.
     fn evaluate_root(&self, base: f64, root: f64) -> CalcResult {
         // Checks whether the root index is zero, which would cause division by zero.
-        if root == 0.0 { return Err(MathError::DivisionByZero.into()); }
+        if root == 0.0 {
+            return Err(MathError::DivisionByZero.into());
+        }
 
         // Handles negative base case.
         if base < 0.0 {
-            
             // Fractional root index is invalid for negative bases in this evaluator.
-            if root.fract() != 0.0 { return Err(MathError::NegativeRoot { base, root }.into()); }
+            if root.fract() != 0.0 {
+                return Err(MathError::NegativeRoot { base, root }.into());
+            }
 
             // Even root index of a negative base is invalid.
-            if (root as i64) % 2 == 0 { return Err(MathError::EvenRootOfNegative { base, root }.into()); }
+            if (root as i64) % 2 == 0 {
+                return Err(MathError::EvenRootOfNegative { base, root }.into());
+            }
 
             // Computes root for negative base.
             let result = -(-base).powf(1.0 / root);
@@ -942,10 +988,12 @@ impl MathExpressionParser {
 
         // Computes root for non-negative base.
         let result = base.powf(1.0 / root);
-        
+
         // If result is NaN or infinite, return an error.
-        if result.is_nan() || result.is_infinite() { return Err(MathError::InvalidRoot { base, root }.into()); }
-        
+        if result.is_nan() || result.is_infinite() {
+            return Err(MathError::InvalidRoot { base, root }.into());
+        }
+
         self.check_overflow(result)
     }
 
@@ -990,44 +1038,56 @@ impl MathExpressionParser {
             // Negation case: evaluates next factor and negates it.
             Some(Token::Minus) => {
                 let val = self.evaluate_b()?; // Factor negation.
-                
+
                 info_log!("Negation of {}", val);
                 Ok(-val)
-            },
+            }
 
             // Opening parenthesis case: evaluate inner expression.
             Some(Token::LeftParen) => {
-                let result = self.evaluate_e()?;  // Parses expression inside parentheses.
+                let result = self.evaluate_e()?; // Parses expression inside parentheses.
 
                 match self.next() {
                     // Verifies the closing parenthesis matches the opening one.
                     Some(Token::RightParen) => Ok(result),
 
                     // If another token appears instead of `)`, return an error.
-                    Some(tok) => {
-                        info_log!("Unexpected token instead of ')': {:?}", tok);
-                        Err(TokenError::UnmatchedParenthesis { found: ')', position: self.position }.into())
-                    },
+                    Some(_tok) => {
+                        info_log!("Unexpected token instead of ')': {:?}", _tok);
+                        Err(TokenError::UnmatchedParenthesis {
+                            found: ')',
+                            position: self.position,
+                        }
+                        .into())
+                    }
 
                     // If there is no next token (missing closing parenthesis).
-                    None => Err(TokenError::UnmatchedParenthesis { found: '(', position: self.position }.into()),
+                    None => Err(TokenError::UnmatchedParenthesis {
+                        found: '(',
+                        position: self.position,
+                    }
+                    .into()),
                 }
-            },
+            }
 
             // Closing parenthesis without a matching opening parenthesis.
             Some(Token::RightParen) => {
                 info_log!("Closing parenthesis without opening parenthesis");
-                Err(TokenError::UnmatchedParenthesis { found: ')', position: self.position }.into())
-            },
+                Err(TokenError::UnmatchedParenthesis {
+                    found: ')',
+                    position: self.position,
+                }
+                .into())
+            }
 
             // Generic error case: invalid token found.
-            token => {
-                info_log!("Invalid factor found: {:?}", token);
+            _token => {
+                info_log!("Invalid factor found: {:?}", _token);
                 Err(TokenError::InvalidExpression("Invalid expression".into()).into())
             }
         }
     }
-    
+
     /// Validates a value by checking overflow and underflow conditions.
     ///
     /// # Returns
@@ -1046,13 +1106,11 @@ impl MathExpressionParser {
         // Subnormal
         else if val.is_subnormal() {
             Err(MathError::UnderflowError.into())
-        }
-            
-        else {
+        } else {
             Ok(val)
         }
     }
-    
+
     /// Returns the current token without advancing the parser position.
     ///
     /// # Returns
@@ -1076,7 +1134,9 @@ impl MathExpressionParser {
     fn next(&mut self) -> Option<Token> {
         let token = self.tokens.get(self.position).copied(); // Since `.get()` returns `&Token`, `.copied()` is used to copy the value out of `Option`.
         // If a valid token exists
-        if token.is_some() { self.advance(); }
+        if token.is_some() {
+            self.advance();
+        }
         token
     }
 
@@ -1086,36 +1146,28 @@ impl MathExpressionParser {
     }
 }
 
-/// Test module for parsing and mathematical expression evaluation.
-///
-/// This module contains unit tests to validate parser/evaluator behavior,
-/// with focus on error handling and correct token identification.
-#[cfg(test)]
-mod tests {
-    use super::*; // Imports all members from the parent module (code under test).
+const DEFAULT_INPUT: &str = "(3 + 5 * (2 - 3) ^ 2) / (4 - 1) + -2 * (5 + 2) ^ 3 - 10 =";
 
-    /// Test that simulates unmatched-parentheses error handling.
-    ///
-    /// Verifies how tokenizer and parser handle an expression with
-    /// missing/mismatched parentheses, simulating expression syntax failure.
-    #[test]
-    fn test_unmatched_parentheses_simulated() {
-        let expression = "((1+2))))) ="; 
-        
-        let mut tokenizer = Tokenizer::new(expression); 
-        let result = tokenizer.tokenize(); 
-        let tokens = result.unwrap(); 
-        let mut parser = MathExpressionParser::new(tokens); 
-        
-        println!("{:?}", parser.evaluate()); // Executes evaluation and prints the result.
+fn resolve_input_expression() -> String {
+    let args: Vec<String> = env::args().skip(1).collect();
+
+    if !args.is_empty() {
+        return args.join(" ");
     }
+
+    if let Ok(input) = env::var("CFGPARSER_INPUT") {
+        if !input.trim().is_empty() {
+            return input;
+        }
+    }
+
+    DEFAULT_INPUT.to_string()
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    
     #[cfg(debug_assertions)]
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug")).init();
-    
+
     /*
     #[cfg(debug_assertions)]
     {
@@ -1128,7 +1180,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .init();
     }
     */
-    
+
     let input = resolve_input_expression();
     info_log!("Input expression: {}", input);
 
@@ -1139,7 +1191,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut parser = MathExpressionParser::new(tokens);
             parser.evaluate()
         }
-        Err(e) => Err(CalcError::Token(e))
+        Err(e) => Err(CalcError::Token(e)),
     };
 
     match result {
@@ -1163,20 +1215,281 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
-const DEFAULT_INPUT: &str = "(3 + 5 * (2 - 3) ^ 2) / (4 - 1) + -2 * (5 + 2) ^ 3 - 10 =";
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-fn resolve_input_expression() -> String {
-    let args: Vec<String> = env::args().skip(1).collect();
-
-    if !args.is_empty() {
-        return args.join(" ");
+    fn tokenize(input: &str) -> Result<Vec<Token>, TokenError> {
+        Tokenizer::new(input).tokenize()
     }
 
-    if let Ok(input) = env::var("CFGPARSER_INPUT") {
-        if !input.trim().is_empty() {
-            return input;
+    fn evaluate(input: &str) -> CalcResult {
+        let tokens = tokenize(input)?;
+        MathExpressionParser::new(tokens).evaluate()
+    }
+
+    fn assert_evaluates_to(input: &str, expected: f64) {
+        let actual = evaluate(input).unwrap_or_else(|error| {
+            panic!("expected {input:?} to evaluate successfully, got {error:?}")
+        });
+        let tolerance = f64::EPSILON * expected.abs().max(1.0) * 8.0;
+        assert!(
+            (actual - expected).abs() <= tolerance,
+            "expected {input:?} to equal {expected}, got {actual}"
+        );
+    }
+
+    #[test]
+    fn maps_every_operator_character_to_a_token() {
+        let cases = [
+            ('+', Token::Plus),
+            ('-', Token::Minus),
+            ('*', Token::Multiply),
+            ('/', Token::Divide),
+            ('^', Token::Caret),
+            ('$', Token::Dollar),
+            ('(', Token::LeftParen),
+            (')', Token::RightParen),
+            ('=', Token::Equals),
+        ];
+
+        for (character, expected) in cases {
+            assert_eq!(Token::from_char(character), Some(expected));
+        }
+        assert_eq!(Token::from_char('%'), None);
+    }
+
+    #[test]
+    fn identifies_basic_binary_operators() {
+        for token in [Token::Plus, Token::Minus, Token::Multiply, Token::Divide] {
+            assert!(token.is_operator());
+        }
+        for token in [
+            Token::Caret,
+            Token::Dollar,
+            Token::LeftParen,
+            Token::Number(1.0),
+        ] {
+            assert!(!token.is_operator());
         }
     }
 
-    DEFAULT_INPUT.to_string()
+    #[test]
+    fn tokenizes_numbers_symbols_and_ascii_whitespace() {
+        assert_eq!(
+            tokenize("\t.5 + 1. - 23\n= ").unwrap(),
+            vec![
+                Token::Number(0.5),
+                Token::Plus,
+                Token::Number(1.0),
+                Token::Minus,
+                Token::Number(23.0),
+                Token::Equals,
+            ]
+        );
+    }
+
+    #[test]
+    fn rejects_malformed_numbers() {
+        assert_eq!(
+            tokenize("1..2 ="),
+            Err(TokenError::InvalidNumber(
+                "Number with multiple decimal points".into()
+            ))
+        );
+        assert_eq!(tokenize(". ="), Err(TokenError::InvalidNumber(".".into())));
+    }
+
+    #[test]
+    fn rejects_unknown_ascii_and_unicode_characters() {
+        assert_eq!(tokenize("2 % 1 ="), Err(TokenError::InvalidOperator('%')));
+        assert_eq!(tokenize("π ="), Err(TokenError::InvalidOperator('π')));
+    }
+
+    #[test]
+    fn evaluates_literals_decimals_and_whitespace() {
+        assert_evaluates_to("42 =", 42.0);
+        assert_evaluates_to(" .5 + 1.25 = ", 1.75);
+        assert_evaluates_to("\n\t3\r + 4 =", 7.0);
+    }
+
+    #[test]
+    fn applies_additive_and_multiplicative_precedence() {
+        assert_evaluates_to("2 + 3 * 4 =", 14.0);
+        assert_evaluates_to("2 * 3 + 4 =", 10.0);
+        assert_evaluates_to("20 / 5 - 1 =", 3.0);
+    }
+
+    #[test]
+    fn addition_subtraction_multiplication_and_division_are_left_associative() {
+        assert_evaluates_to("20 - 5 - 3 =", 12.0);
+        assert_evaluates_to("100 / 10 / 2 =", 5.0);
+        assert_evaluates_to("2 * 3 / 4 =", 1.5);
+    }
+
+    #[test]
+    fn evaluates_unary_negation_and_nested_parentheses() {
+        assert_evaluates_to("-5 =", -5.0);
+        assert_evaluates_to("--5 =", 5.0);
+        assert_evaluates_to("-(2 + 3) =", -5.0);
+        assert_evaluates_to("((2 + 3) * (4 - 1)) =", 15.0);
+    }
+
+    #[test]
+    fn unary_negation_binds_before_exponentiation() {
+        assert_evaluates_to("-2 ^ 2 =", 4.0);
+        assert_evaluates_to("-(2 ^ 2) =", -4.0);
+    }
+
+    #[test]
+    fn exponentiation_and_roots_are_right_associative() {
+        assert_evaluates_to("2 ^ 3 ^ 2 =", 512.0);
+        assert_evaluates_to("16 $ 2 ^ 2 =", 2.0);
+        assert_evaluates_to("256 $ 2 $ 2 =", 256.0_f64.powf(1.0 / 2.0_f64.sqrt()));
+    }
+
+    #[test]
+    fn evaluates_valid_roots() {
+        assert_evaluates_to("27 $ 3 =", 3.0);
+        assert_evaluates_to("16 $ 2 =", 4.0);
+        assert_evaluates_to("-8 $ 3 =", -2.0);
+    }
+
+    #[test]
+    fn supports_every_implicit_multiplication_pair() {
+        assert_evaluates_to("2 3 =", 6.0);
+        assert_evaluates_to("2(3 + 4) =", 14.0);
+        assert_evaluates_to("(1 + 2)3 =", 9.0);
+        assert_evaluates_to("(1 + 2)(3 + 4) =", 21.0);
+    }
+
+    #[test]
+    fn rejects_division_by_zero_and_zero_index_roots() {
+        assert_eq!(
+            evaluate("1 / 0 ="),
+            Err(CalcError::Math(MathError::DivisionByZero))
+        );
+        assert_eq!(
+            evaluate("27 $ 0 ="),
+            Err(CalcError::Math(MathError::DivisionByZero))
+        );
+    }
+
+    #[test]
+    fn rejects_invalid_negative_roots() {
+        assert_eq!(
+            evaluate("-16 $ 2 ="),
+            Err(CalcError::Math(MathError::EvenRootOfNegative {
+                base: -16.0,
+                root: 2.0,
+            }))
+        );
+        assert_eq!(
+            evaluate("-8 $ 2.5 ="),
+            Err(CalcError::Math(MathError::NegativeRoot {
+                base: -8.0,
+                root: 2.5,
+            }))
+        );
+    }
+
+    #[test]
+    fn rejects_non_finite_power_and_root_results() {
+        assert_eq!(
+            evaluate("-4 ^ .5 ="),
+            Err(CalcError::Math(MathError::InvalidExponentiation {
+                base: -4.0,
+                exponent: 0.5,
+            }))
+        );
+        assert_eq!(
+            evaluate("0 $ -1 ="),
+            Err(CalcError::Math(MathError::InvalidRoot {
+                base: 0.0,
+                root: -1.0,
+            }))
+        );
+    }
+
+    #[test]
+    fn detects_overflow_and_underflow() {
+        let parser = MathExpressionParser::new(Vec::new());
+        assert_eq!(
+            parser.check_overflow(f64::INFINITY),
+            Err(CalcError::Math(MathError::OverflowError))
+        );
+        assert_eq!(
+            parser.check_overflow(f64::from_bits(1)),
+            Err(CalcError::Math(MathError::UnderflowError))
+        );
+        assert_eq!(parser.check_overflow(0.0), Ok(0.0));
+        assert_eq!(parser.check_overflow(f64::MAX), Ok(f64::MAX));
+    }
+
+    #[test]
+    fn requires_a_final_terminator_and_rejects_trailing_tokens() {
+        assert_eq!(
+            evaluate("2 + 3"),
+            Err(CalcError::Token(TokenError::UnexpectedEnd))
+        );
+        assert_eq!(
+            evaluate("2 + 3 = 5"),
+            Err(CalcError::Token(TokenError::UnexpectedToken(
+                Token::Number(5.0)
+            )))
+        );
+        assert_eq!(
+            evaluate("2 + 3 =="),
+            Err(CalcError::Token(TokenError::UnexpectedToken(Token::Equals)))
+        );
+    }
+
+    #[test]
+    fn rejects_missing_operands() {
+        for input in ["=", "2 + =", "2 - =", "2 * =", "2 / =", "2 ^ =", "2 $ ="] {
+            assert!(
+                matches!(
+                    evaluate(input),
+                    Err(CalcError::Token(TokenError::InvalidExpression(_)))
+                ),
+                "expected invalid expression for {input:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn reports_unmatched_parentheses() {
+        assert!(matches!(
+            evaluate("(2 + 3 ="),
+            Err(CalcError::Token(TokenError::UnmatchedParenthesis {
+                found: ')',
+                ..
+            })) | Err(CalcError::Token(TokenError::UnmatchedParenthesis {
+                found: '(',
+                ..
+            }))
+        ));
+        assert_eq!(
+            evaluate("2 + 3) ="),
+            Err(CalcError::Token(TokenError::UnexpectedToken(
+                Token::RightParen
+            )))
+        );
+    }
+
+    #[test]
+    fn error_messages_are_human_readable() {
+        assert_eq!(
+            MathError::DivisionByZero.to_string(),
+            "Math error: division by zero"
+        );
+        assert_eq!(
+            TokenError::InvalidOperator('%').to_string(),
+            "Error: invalid operator '%'"
+        );
+        assert_eq!(
+            CalcError::Token(TokenError::UnexpectedEnd).to_string(),
+            "Parsing error: Error: expression ended unexpectedly"
+        );
+    }
 }
