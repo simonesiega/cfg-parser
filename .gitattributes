@@ -1,0 +1,22 @@
+# Keep text behavior predictable across Windows, macOS, and Linux.
+* text=auto
+
+*.md text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.svg text eol=lf
+
+.dockerignore text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+Dockerfile text eol=lf
+LICENSE text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary

@@ -1,3 +1,8 @@
 .git
+.github
 target
 docs
+scripts
+.env
+.env.*
+*.log

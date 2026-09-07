@@ -2,19 +2,25 @@
 name = "cfg-parser"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.85"
+description = "A context-free grammar arithmetic parser and evaluator"
+license = "MIT"
+repository = "https://github.com/simonesiega/cfg-parser"
+readme = "README.md"
+keywords = ["arithmetic", "cfg", "cli", "parser", "recursive-descent"]
+categories = ["command-line-utilities", "parsing"]
 
 [dependencies]
 log = "0.4.27"
 env_logger = "0.11.8"
 
-# Configurazioni dei profili di compilazione
 [profile.dev]
 opt-level = 0
-debug = true                 
-overflow-checks = true       
+debug = true
+overflow-checks = true
 
 [profile.release]
-opt-level = 3                
-debug = false                
-panic = "abort"              
+opt-level = 3
+debug = false
+panic = "abort"
 lto = true

@@ -4,4 +4,8 @@ services:
   cfgparser:
     build:
       context: .
-    image: cfgparser
+    image: cfg-parser:local
+    network_mode: none
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
