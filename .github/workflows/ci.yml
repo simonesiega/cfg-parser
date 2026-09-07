@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Rust tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Select stable Rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: Test locked dependency graph
+        run: cargo test --locked
+
+  release-smoke:
+    name: Release build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Select stable Rust
+        run: |
+          rustup update stable
+          rustup default stable
+
+      - name: Build release binary
+        run: cargo build --release --locked
+
+      - name: Evaluate a representative expression
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(cargo run --quiet --release --locked -- "2(3 + 4) =")"
+          test "$output" = "Result: 14.000"
+
+  documentation:
+    name: Documentation links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate local documentation links
+        run: node scripts/check-doc-links.mjs
+
+  docker:
+    name: Docker build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build image
+        run: docker build --tag cfg-parser:ci .
+
+      - name: Evaluate a representative expression
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(docker run --rm --network none cfg-parser:ci "27 $ 3 =")"
+          test "$output" = "Result: 3.000"

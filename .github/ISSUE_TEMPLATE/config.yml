@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/simonesiega/cfg-parser/security/advisories/new
+    about: Report suspected security vulnerabilities privately.
+  - name: Usage and troubleshooting
+    url: https://github.com/simonesiega/cfg-parser/blob/master/docs/guides/troubleshooting.md
+    about: Review common setup, shell, parser, and Docker problems before opening an issue.

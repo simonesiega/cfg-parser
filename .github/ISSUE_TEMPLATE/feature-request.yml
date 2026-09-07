@@ -1,0 +1,60 @@
+name: Feature request
+description: Propose a focused improvement to CFG Parser
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Search existing issues first. For new syntax or precedence changes, explain how the proposal fits the formal grammar.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and did not find this proposal.
+          required: true
+        - label: I am describing one focused improvement.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What limitation or use case should this change address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the behavior precisely. Include example expressions and expected results when relevant.
+      placeholder: |
+        Accepted input: ...
+        Expected output: ...
+        Invalid or boundary input: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: grammar
+    attributes:
+      label: Grammar and compatibility impact
+      description: For syntax changes, identify precedence, associativity, ambiguity, and effects on existing expressions. Write "Not applicable" for non-language changes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches or workarounds did you consider?
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add links, examples, sketches, or implementation notes that may help evaluate the proposal.
