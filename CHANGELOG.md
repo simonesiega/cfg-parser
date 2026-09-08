@@ -20,6 +20,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Clarified the implemented grammar for adjacent numbers, unary minus precedence, and mixed right-associative power/root chains.
 - Added package metadata and hardened the Docker runtime configuration.
 
+### Fixed
+
+- Reject decimal literals outside the finite `f64` range instead of printing an infinite result.
+- Reject unsupported Unicode whitespace without panicking on a non-character byte boundary.
+
 ## Release status
 
 The crate manifest currently uses version `0.1.0`, but the repository has not published a tagged release. The first release section will be cut from **Unreleased** when a version is tagged.

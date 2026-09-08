@@ -430,8 +430,8 @@ impl<'a> Tokenizer<'a> {
             let c = self.current_char();
 
             match c {
-                // Ignores whitespace.
-                c if c.is_whitespace() => self.advance(),
+                // Ignores supported ASCII whitespace.
+                c if c.is_ascii_whitespace() => self.advance(),
 
                 // Handles numeric sequences, including decimals.
                 c if c.is_ascii_digit() || c == '.' => {
@@ -500,11 +500,13 @@ impl<'a> Tokenizer<'a> {
         // Extracts the substring representing a number from start to current position.
         let number_str = &self.input[start..self.position];
 
-        // Attempts to parse the substring into an `f64` numeric value.
-        // On success, returns `Token::Number(n)`.
-        // On parse failure, returns `TokenError::InvalidNumber` with the invalid string.
+        // Attempts to parse the substring into a finite `f64` numeric value.
+        // Non-finite literals are rejected before they reach the evaluator.
         match number_str.parse::<f64>() {
-            Ok(n) => Ok(Token::Number(n)),
+            Ok(n) if n.is_finite() => Ok(Token::Number(n)),
+            Ok(_) => Err(TokenError::InvalidNumber(
+                "Number is outside the finite f64 range".into(),
+            )),
             Err(_) => Err(TokenError::InvalidNumber(number_str.to_string())),
         }
     }
@@ -516,10 +518,9 @@ impl<'a> Tokenizer<'a> {
         self.input[self.position..].chars().next().unwrap()
     }
 
-    /// Advances the current position by one, moving to the next input character.
-    /// Positioning is character-index based and assumes `current_char()` was already evaluated.
+    /// Advances by the UTF-8 width of the current input character.
     fn advance(&mut self) {
-        self.position += 1;
+        self.position += self.current_char().len_utf8();
     }
 }
 
@@ -1298,12 +1299,24 @@ mod tests {
             ))
         );
         assert_eq!(tokenize(". ="), Err(TokenError::InvalidNumber(".".into())));
+
+        let oversized = format!("{} =", "9".repeat(400));
+        assert_eq!(
+            tokenize(&oversized),
+            Err(TokenError::InvalidNumber(
+                "Number is outside the finite f64 range".into()
+            ))
+        );
     }
 
     #[test]
     fn rejects_unknown_ascii_and_unicode_characters() {
         assert_eq!(tokenize("2 % 1 ="), Err(TokenError::InvalidOperator('%')));
         assert_eq!(tokenize("π ="), Err(TokenError::InvalidOperator('π')));
+        assert_eq!(
+            tokenize("1\u{00a0}+ 2 ="),
+            Err(TokenError::InvalidOperator('\u{00a0}'))
+        );
     }
 
     #[test]

@@ -76,3 +76,31 @@ fn invalid_input_returns_a_failure_status_without_a_result() {
         stderr(&output)
     );
 }
+
+#[test]
+fn unsupported_unicode_whitespace_returns_an_error_without_panicking() {
+    let output = run(&["1\u{00a0}+ 2 ="], None);
+    let error = stderr(&output);
+
+    assert!(!output.status.success());
+    assert!(stdout(&output).is_empty());
+    assert!(
+        error.contains("InvalidOperator"),
+        "unexpected stderr: {error}"
+    );
+    assert!(!error.contains("panicked"), "unexpected panic: {error}");
+}
+
+#[test]
+fn non_finite_numeric_literals_are_rejected() {
+    let expression = format!("{} =", "9".repeat(400));
+    let output = run(&[&expression], None);
+    let error = stderr(&output);
+
+    assert!(!output.status.success());
+    assert!(stdout(&output).is_empty());
+    assert!(
+        error.contains("Number is outside the finite f64 range"),
+        "unexpected stderr: {error}"
+    );
+}

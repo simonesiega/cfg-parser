@@ -74,7 +74,7 @@ Equals
 The tokenizer does not insert an implicit multiplication token between `2` and `(`. That relationship is interpreted later by the parser.
 
 > [!NOTE]
-> The language syntax is ASCII-oriented. The current tokenizer indexes the source string by byte position and advances one byte at a time, so arbitrary Unicode input is outside the supported input model.
+> The language syntax is ASCII-oriented. The tokenizer advances by each character's UTF-8 width so unsupported Unicode input is rejected safely without leaving the scanner at an invalid byte boundary.
 
 ![Tokenizer phase diagram](../assets/diagrams/tokenizer.png)
 

@@ -63,7 +63,7 @@ Accepted forms include:
 1.
 ```
 
-Malformed forms such as `.` and `1..2` are rejected.
+Malformed forms such as `.` and `1..2` are rejected. Decimal literals whose magnitude parses outside the finite `f64` range are also rejected.
 
 Scientific notation is not recognized because `e` and `E` are not language tokens.
 
@@ -340,7 +340,7 @@ A zero root index uses the evaluator's division-by-zero error path.
 
 ## Numeric model
 
-All literals and intermediate values use IEEE 754 `f64`.
+All literals and intermediate values use IEEE 754 `f64`. Numeric literals must parse to a finite value.
 
 The evaluator checks several invalid numeric conditions during arithmetic operations, including:
 
@@ -386,6 +386,7 @@ CLI output formatting is documented in [CLI usage](usage.md).
 | `2 + 3 = 5` | Trailing token after `=`. |
 | `1e3 =` | Scientific notation is not tokenized. |
 | `1..2 =` | Multiple decimal points. |
+| A decimal literal beyond finite `f64` range | Non-finite numeric literal. |
 
 ## Implementation mapping
 

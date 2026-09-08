@@ -186,7 +186,7 @@ The evaluator rejects zero indices, fractional indices for negative bases, and e
 
 ### A decimal literal is rejected
 
-**Fix:** Use ASCII digits with no more than one decimal point. Scientific notation is not supported.
+**Fix:** Use ASCII digits with no more than one decimal point. Scientific notation is not supported, and literals beyond the finite `f64` range are rejected.
 
 Accepted shapes include `42`, `3.14`, `.5`, and `1.`. See [Grammar: numbers](grammar.md#numbers).
 
