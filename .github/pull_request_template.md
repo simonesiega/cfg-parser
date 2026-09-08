@@ -16,8 +16,8 @@
 
 - [ ] `cargo test --locked`
 - [ ] `cargo build --release --locked`
-- [ ] `cargo fmt` (Rust changes)
-- [ ] `cargo clippy --all-targets --all-features --locked` (Rust changes)
+- [ ] `cargo fmt --all -- --check` (Rust changes)
+- [ ] `cargo clippy --all-targets --all-features --locked -- -D warnings` (Rust changes)
 - [ ] `node scripts/check-doc-links.mjs` (documentation changes)
 - [ ] Docker build and smoke test (Docker changes)
 

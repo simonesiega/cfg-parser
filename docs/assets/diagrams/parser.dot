@@ -1,0 +1,51 @@
+digraph parser {
+  graph [
+    rankdir=TB,
+    bgcolor="transparent",
+    pad=0.35,
+    nodesep=0.45,
+    ranksep=0.50,
+    fontname="DejaVu Sans",
+    fontsize=22,
+    label="Recursive-descent parsing and direct evaluation",
+    labelloc=t
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    color="#334155",
+    fillcolor="#f8fafc",
+    fontcolor="#0f172a",
+    fontname="DejaVu Sans",
+    fontsize=15,
+    margin="0.20,0.13"
+  ];
+  edge [
+    color="#475569",
+    fontcolor="#334155",
+    fontname="DejaVu Sans",
+    fontsize=12,
+    arrowsize=0.8
+  ];
+
+  tokens [label="Vec<Token>", fillcolor="#dbeafe"];
+  formula [label="Formula F — evaluate\nparse E, require =, reject trailing tokens"];
+  expression [label="Expression E\nevaluate_e / evaluate_e_prime\n+ and - (left-associative)"];
+  product [label="Product P\nevaluate_p / evaluate_p_prime\n*, /, implicit multiplication (left-associative)"];
+  unit [label="Unit U\nevaluate_u / evaluate_u_prime\n^ and $ (right-associative)"];
+  base [label="Base B — evaluate_b\nnumber, unary -, or parenthesized E"];
+  value [label="Numeric values return through each layer\nwhile operators update the accumulated f64", fillcolor="#ecfccb"];
+  complete [label="Formula validates the final =\nand confirms that no tokens remain"];
+  result [label="f64 result\nCLI prints Result: <value>", fillcolor="#dcfce7"];
+  error [label="Any layer may stop with CalcError\nTokenError or MathError", fillcolor="#fee2e2"];
+
+  tokens -> formula;
+  formula -> expression [label="delegate"];
+  expression -> product [label="parse operands"];
+  product -> unit [label="parse operands"];
+  unit -> base [label="parse operand"];
+  base -> value [label="direct evaluation"];
+  value -> complete;
+  complete -> result [label="valid"];
+  complete -> error [label="syntax or math failure", color="#dc2626"];
+}

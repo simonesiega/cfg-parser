@@ -1,0 +1,56 @@
+digraph tokenizer {
+  graph [
+    rankdir=TB,
+    bgcolor="transparent",
+    pad=0.35,
+    nodesep=0.45,
+    ranksep=0.60,
+    fontname="DejaVu Sans",
+    fontsize=22,
+    label="Tokenizer: expression text to typed tokens",
+    labelloc=t
+  ];
+  node [
+    shape=box,
+    style="rounded,filled",
+    color="#334155",
+    fillcolor="#f8fafc",
+    fontcolor="#0f172a",
+    fontname="DejaVu Sans",
+    fontsize=15,
+    margin="0.18,0.12"
+  ];
+  edge [
+    color="#475569",
+    fontcolor="#334155",
+    fontname="DejaVu Sans",
+    fontsize=12,
+    arrowsize=0.8
+  ];
+
+  source [label="Expression source\n2(3 + 4) =", fillcolor="#dbeafe"];
+  read [label="Read the current character"];
+  classify [label="Classify character", shape=diamond, style="filled", fillcolor="#fef3c7"];
+  whitespace [label="Skip supported whitespace"];
+  number [label="Parse decimal literal\nASCII digits + optional decimal point"];
+  symbol [label="Map one-character symbol\n+  -  *  /  ^  $  (  )  ="];
+  emit [label="Append Token"];
+  more [label="Input remaining?", shape=diamond, style="filled", fillcolor="#fef3c7"];
+  tokens [label="Vec<Token>\nNumber(2), LeftParen, Number(3), Plus,\nNumber(4), RightParen, Equals", fillcolor="#dcfce7"];
+  invalid_number [label="TokenError::InvalidNumber", fillcolor="#fee2e2"];
+  invalid_symbol [label="TokenError::InvalidOperator", fillcolor="#fee2e2"];
+
+  source -> read;
+  read -> classify;
+  classify -> whitespace [label="whitespace"];
+  classify -> number [label="digit or ."];
+  classify -> symbol [label="known symbol"];
+  classify -> invalid_symbol [label="other"];
+  whitespace -> more;
+  number -> emit [label="valid"];
+  number -> invalid_number [label="malformed"];
+  symbol -> emit;
+  emit -> more;
+  more -> read [label="yes"];
+  more -> tokens [label="no"];
+}

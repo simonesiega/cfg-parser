@@ -1,146 +1,167 @@
-<h1 align="center">
-  <img src="docs/assets/cfg-parser-logo.svg" alt="CFG Parser logo" width="220" height="220" />
-  <br />
-  CFG Parser
-</h1>
+<h1 align="center">CFG Parser</h1>
 
 <p align="center">
-A Rust CLI tool that parses and evaluates arithmetic expressions
-using a Context-Free Grammar (CFG) engine.
+  <strong>A compact Rust CLI for tokenizing, parsing, and evaluating arithmetic expressions with a hand-written recursive-descent parser.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/simonesiega/cfg-parser/stargazers"><img src="https://img.shields.io/github/stars/simonesiega/cfg-parser?style=social" alt="GitHub stars" /></a>
-  <a href="https://github.com/simonesiega/cfg-parser/issues"><img src="https://img.shields.io/github/issues/simonesiega/cfg-parser" alt="Open issues" /></a>
-  <a href="https://github.com/simonesiega/cfg-parser/pulls"><img src="https://img.shields.io/github/issues-pr/simonesiega/cfg-parser" alt="Open pull requests" /></a>
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#usage">Usage</a> ·
+  <a href="docs/README.md">Documentation</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/simonesiega/cfg-parser/actions/workflows/ci.yml"><img src="https://github.com/simonesiega/cfg-parser/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI status" /></a>
+  <img src="https://img.shields.io/badge/rust-2024%20edition-000000?logo=rust" alt="Rust 2024 edition" />
   <a href="https://github.com/simonesiega/cfg-parser/commits/master"><img src="https://img.shields.io/github/last-commit/simonesiega/cfg-parser" alt="Last commit" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/simonesiega/cfg-parser" alt="License" /></a>
-  <img src="https://img.shields.io/badge/rust-2024%20edition-black?logo=rust" alt="Rust 2024 edition" />
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/simonesiega/cfg-parser" alt="MIT license" /></a>
 </p>
 
 ## Overview
 
-CFG Parser is a Rust CLI project that tokenizes, parses, and evaluates arithmetic formulas based on a formal grammar.
-It supports nested expressions, implicit multiplication, exponentiation, and n-th root operations with explicit error handling.
+**CFG Parser** is a small arithmetic-language implementation written in Rust. It tokenizes source text, parses it with a hand-written recursive-descent parser, and evaluates the expression according to an explicit context-free grammar.
 
-## Key Features
-
-- Formal CFG-driven parsing pipeline.
-- Separate tokenizer and parser/evaluator architecture.
-- Real-number support (`f64`) with operator precedence.
-- Implicit multiplication (`2(3+4)`, `(1+2)(4-1)`).
-- Power (`^`) and n-th root (`$`) with semantic validation.
-- Clear math/parsing error types for robust diagnostics.
-
-## Supported Operators
-
-| Operator | What it does | Example |
-| --- | --- | --- |
-| `+` | Adds two values | `3 + 2 =` |
-| `-` | Subtracts one value from another | `7 - 4 =` |
-| `*` | Multiplies two values | `6 * 5 =` |
-| `/` | Divides one value by another | `8 / 2 =` |
-| `^` | Raises a base to a power | `2 ^ 3 =` |
-| `$` | Computes the n-th root (`base $ index`) | `27 $ 3 =` |
-| `( )` | Groups expressions and controls precedence | `(1 + 2) * 3 =` |
-| `implicit *` | Multiplies adjacent terms without `*` | `2(3+4) =` |
-
-## Documentation and design details are documented in the `docs` directory:
-
-- Grammar details: [`Grammar`](docs/md/grammar.md)
-- Architecture overview: [`Architecture`](docs/md/architecture.md)
-- Docker guide: [`Docker`](docs/md/docker.md)
-- Contribution guidelines: [`Contributing`](CONTRIBUTING.MD)
-
-## Quick Start
-
-### Run with Rust
-
-```bash
-cargo run
+```console
+$ cfg-parser "2(3 + 4) ="
+Result: 14.000
 ```
 
-### Run Tests
+The project is intentionally compact and educational: precedence, associativity, implicit multiplication, exponentiation, roots, syntax validation, and mathematical errors are handled directly by the parser without a parser generator or intermediate AST.
+
+For the complete language and implementation details, use the [documentation hub](docs/README.md).
+
+## Quick start
+
+Clone the repository and run an expression:
 
 ```bash
-cargo test
-```
-
-## Docker Usage
-
-Build and run:
-
-```bash
-docker build -t cfgparser .
-docker run --rm cfgparser
-```
-
-Run with custom input (CLI argument):
-
-```bash
-docker run --rm cfgparser "(1 + 2) * 3 ="
-```
-
-Run with custom input (environment variable):
-
-```bash
-docker run --rm -e CFGPARSER_INPUT="27 $ 3 =" cfgparser
-```
-
-For full Docker workflows, troubleshooting, and compose examples, see [`Docker docs`](docs/md/docker.md).
-
-## Example Expression
-
-Simple example:
-
-```text
-1 + 2 * 3 =
+git clone https://github.com/simonesiega/cfg-parser.git
+cd cfg-parser
+cargo run --release -- "2 + 3 * 4 ="
 ```
 
 Expected output:
 
 ```text
-Result: 7.000
+Result: 14.000
 ```
 
-Complex example:
+## Installation
+
+Install directly from Git:
+
+```bash
+cargo install --git https://github.com/simonesiega/cfg-parser.git --locked
+```
+
+Then run:
+
+```bash
+cfg-parser "(1 + 2) * 3 ="
+```
+
+Building from source requires Rust 1.85 or newer.
+
+See [Getting started](docs/guides/getting-started.md) for the complete native and Docker setup.
+
+## Usage
+
+Pass one complete expression to the CLI:
+
+```bash
+cfg-parser "2 ^ 8 ="
+cfg-parser "(1 + 2)(3 + 4) ="
+cfg-parser "27 $ 3 ="
+```
+
+Every complete expression ends with `=`.
+
+| Syntax | Operation |
+| --- | --- |
+| `a + b` | Addition |
+| `a - b` | Subtraction |
+| `a * b` | Multiplication |
+| `a / b` | Division |
+| `-a` | Unary negation |
+| `a ^ b` | Exponentiation |
+| `a $ b` | `b`-th root of `a` |
+| `( ... )` | Grouping |
+| adjacency | Implicit multiplication |
+
+Successful evaluations are printed to three decimal places.
+
+See [CLI usage](docs/guides/usage.md) for input sources, shell quoting, output, exit behavior, and current CLI boundaries.
+
+See [Grammar](docs/guides/grammar.md) for the canonical syntax, precedence, associativity, implicit-multiplication rules, and numeric semantics.
+
+## Architecture overview
+
+CFG Parser uses a two-stage pipeline:
 
 ```text
-(3 + 5 * (2 - 3) ^ 2) / (4 - 1) + -2 * (5 + 2) ^ 3 - 10 =
+source text
+    │
+    ▼
+Tokenizer
+    │
+    ▼
+Vec<Token>
+    │
+    ▼
+recursive-descent parser
+    │
+    ├── syntax validation
+    ├── precedence / associativity
+    └── evaluation
+    │
+    ▼
+f64 or CalcError
 ```
 
-Expected output:
+Parsing and evaluation happen in the same traversal; the current implementation does not construct an intermediate abstract syntax tree.
 
-```text
-Result: -693.333
+See [Architecture](docs/guides/architecture.md) for the tokenizer, grammar layers, error flow, numeric model, and test boundaries.
+
+## Documentation
+
+Start with the [documentation hub](docs/README.md), or jump directly to:
+
+- [Getting started](docs/guides/getting-started.md) — installation and verification.
+- [CLI usage](docs/guides/usage.md) — command-line behavior and input sources.
+- [Grammar](docs/guides/grammar.md) — language syntax and semantics.
+- [Architecture](docs/guides/architecture.md) — tokenizer, parser, evaluator, and errors.
+- [Docker](docs/guides/docker.md) — image and Compose workflow.
+- [Troubleshooting](docs/guides/troubleshooting.md) — common setup and runtime problems.
+- [Release process](docs/guides/releasing.md) — versioning, validation, tagging, and publication.
+
+Additional contributor, security, changelog, and project-policy documentation is indexed from the documentation hub.
+
+## Local development
+
+```bash
+git clone https://github.com/simonesiega/cfg-parser.git
+cd cfg-parser
+cargo test --locked
 ```
 
-## Error Handling
+See [Contributing](CONTRIBUTING.md) for the full development, validation, testing, documentation, and pull-request workflow.
 
-The parser reports structured errors such as:
+## Security
 
-- Division by zero.
-- Invalid operators or malformed numbers.
-- Unmatched parentheses.
-- Invalid exponentiation/root cases.
-- Overflow and underflow conditions.
+Report suspected vulnerabilities privately rather than through a public issue.
 
-## Contributing & support 🤝
-
-Contributions are welcome.
-
-- For bugs and feature requests, open an [Issue](https://github.com/simonesiega/cfg-parser/issues).
-- For code contributions, open a **Pull Request** with a clear description of the change and its rationale.
-- For direct contact, email me at [simonesiega1@gmail.com](mailto:simonesiega1@gmail.com) or reach out on [GitHub](https://github.com/simonesiega).
+See [`SECURITY.md`](SECURITY.md) for supported versions, the security model, and private reporting channels.
 
 ## License
 
-This project is licensed under the MIT License. See [`LICENSE`](LICENSE).
+CFG Parser is licensed under the [MIT License](LICENSE).
 
-## Authors 🧑‍💻
+## Contributors
 
 <p align="center">
   <a href="https://github.com/simonesiega/cfg-parser/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=simonesiega/cfg-parser&max=24&columns=12" alt="Contributors" />
+    <img src="https://contrib.rocks/image?repo=simonesiega/cfg-parser&max=24&columns=12" alt="CFG Parser contributors" />
   </a>
 </p>
